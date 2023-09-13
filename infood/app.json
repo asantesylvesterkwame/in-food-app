@@ -21,13 +21,22 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/InFood.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.asantesylvesterkwame.infoodapp"
     },
     "web": {
       "favicon": "./assets/InFood.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b56a9afc-d05d-43ac-b846-8eebd9ee1cc3"
+      }
+    }
   }
 }
