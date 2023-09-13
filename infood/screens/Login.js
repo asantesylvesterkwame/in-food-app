@@ -24,7 +24,7 @@ export default function Login({ navigation }) {
         const user = userCredential.user;
         console.log(user);
         if (user) {
-          navigation.navigate("ProfileSetup");
+          navigation.navigate("Home");
         }
         // ...
       })
