@@ -5,21 +5,61 @@ import { Button } from "react-native-paper";
 import { TextInput } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../globals/styles";
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Link } from "expo-router";
+import { getAuth, updateProfile } from "firebase/auth";
+import PhoneInput from "react-native-phone-number-input";
+import * as ImagePicker from "expo-image-picker";
+
 
 const Stack = createStackNavigator();
 export default function ProfileSetup({ navigation }) {
+  const [updateStatus, setUpdateStatus] = useState(null);
+  const [error, setError] = useState(null);
+  const [imageURI, setImageURI] = useState(null);
+
+  const handleImagePicker = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "Images",
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    if (!result.canceled) {
+      setImageURI(result.uri);
+    }
+  };
+
   const { register, handleSubmit, setValue } = useForm();
+  const auth = getAuth();
   const onSubmit = useCallback((formData) => {
+    updateProfile(auth.currentUser, {
+      displayName: formData.displayName,
+      phoneNumber: formData.phoneNumber,
+      photoURL: imageURI,
+    })
+      .then(() => {
+        // Profile updated!
+        console.log(auth.currentUser);
+        setTimeout(() => {
+          setUpdateStatus("Profile has been updated Successfully");
+        }, 5000);
+        navigation.navigate("Home");
+        // ...
+      })
+      .catch((error) => {
+        // An error occurred
+        // ...
+        setError("Profile Update failed Try again");
+      });
     console.log(formData);
   }, []);
 
   useEffect(() => {
-    register("name");
-    register("password");
+    register("displayName");
+    register("phone-number");
   }, [register]);
 
   const onChangeField = useCallback(
@@ -42,19 +82,63 @@ export default function ProfileSetup({ navigation }) {
             <Text style={styles.LogoText1}>Setup</Text>
           </View>
 
+          <View style={styles.imageContainer}>
+            {!imageURI ? (
+              <>
+                <Image
+                  title="Select Image"
+                  onPress={handleImagePicker}
+                  style={styles.Icon}
+                  // textColor={colors.secondary}
+                  // mode="contained"
+                  source={require("../assets/no-profile-picture-15257.png")}
+                />
+                <Button
+                  title="Select Image"
+                  onPress={handleImagePicker}
+                  style={styles.imageUploadBtn}
+                  textColor={colors.secondary}
+                  mode="contained"
+                >
+                  Upload Picture
+                </Button>
+                
+              </>
+            ) : (
+              <>
+                <Image
+                  source={{ uri: imageURI }}
+                  style={styles.image}
+                />
+                <Button
+                  title="Select Image"
+                  onPress={handleImagePicker}
+                  style={styles.imageUploadBtn}
+                  textColor={colors.secondary}
+                  mode="contained"
+                >
+                  Change Photo
+                </Button>
+              </>
+            )}
+          </View>
           <TextInput
-            autoCompleteType="Full Name"
-            keyboardType="Full Name"
-            textContentType="Full Name"
+            autoCompleteType="displayName"
+            keyboardType="ascii-capable"
             placeholder="Full Name"
-            onChangeText={onChangeField("name")}
+            onChangeText={onChangeField("displayName")}
             underlineColor="transparent"
             style={styles.textInput}
           />
-          <TextInput
+          <PhoneInput
+            defaultCode="GH"
+            layout="first"
+            withShadow
+            autoFocus
             autoCompleteType="Phone Number"
             placeholder="Phone Number"
-            onChangeText={onChangeField("password")}
+            keyboardType="phone-pad"
+            onChangeText={onChangeField("phone-number")}
             style={styles.textInput}
             underlineColor="transparent"
           />
@@ -79,7 +163,22 @@ export default function ProfileSetup({ navigation }) {
           >
             Submit
           </Button>
-          
+          {updateStatus && (
+            <View
+              style={styles.successCont}
+              textColor={colors.secondary}
+            >
+              <Text style={styles.successText}>{updateStatus}</Text>
+            </View>
+          )}
+          {error && (
+            <View
+              style={styles.errorCont}
+              textColor={colors.secondary}
+            >
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -118,5 +217,45 @@ const styles = StyleSheet.create({
     width: "80%",
     borderBottom: "transparent",
     borderColor: colors.primary,
+  },
+  errorCont: {
+    backgroundColor: colors.error,
+    padding: "5%",
+    borderRadius: 10,
+  },
+  errorText: {
+    color: colors.secondary,
+  },
+  successCont: {
+    backgroundColor: colors.success,
+    padding: "5%",
+    borderRadius: 10,
+  },
+  successText: {
+    color: colors.secondary,
+  },
+  imageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: "80%",
+    gap: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 100,
+    overflow: "hidden",
+  },
+  imageUploadBtn: {
+    backgroundColor: colors.tertiary,
+    color: colors.secondary,
+    padding: "1%",
+    width: "100%",
+    textAlign: "center",
+  },
+  Icon: {
+    width: 100,
+    height: 100,
+    fill: colors.tertiary,
   },
 });
