@@ -10,9 +10,29 @@ import Settings from "./screens/NavigationDrawerScreens/Settings";
 import Help from "./screens/NavigationDrawerScreens/Help";
 
 
-const DrawerNavigator = createDrawerNavigator({
-  Home: HomeScreen,
-  Menu: MenuScreen,
-});
+const DrawerNavigator = createDrawerNavigator(
+  {
+    Home: {
+      screen: Home,
+      navigationOptions: {
+        drawerLabel: "Home",
+        title: "overview",
+      },
+    },
+    Resturant: {
+      screen: Resturant,
+      navigationOptions: {
+        drawerLabel: "Resturant",
+        title: "overview",
+      },
+    },
+  },
+  {
+    initialRouteName: "Home",
+    contentOptions: {
+      activeTintColor: "#e91e63",
+    },
+  }
+);
 
-export default createAppContainer(DrawerNavigator);
+export default DrawerNavigator;
