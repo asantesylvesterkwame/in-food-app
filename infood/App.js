@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <AppDrawerNavigator/>
+      {/* <AppDrawerNavigator/> */}
       <StatusBar
         backgroundColor="#2b2b2b"
         translucent={true}
