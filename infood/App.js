@@ -7,19 +7,31 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import ProfileSetup from "./screens/ProfileSetup";
 import { StatusBar } from "expo-status-bar";
-import AppDrawerNavigator from "./AppDrawerNavigator";
+
+import "./firebase.config";
 
 const Stack = createStackNavigator();
 export default function App() {
+ 
   return (
     <NavigationContainer>
       {/* <AppDrawerNavigator/> */}
+
       <StatusBar
         backgroundColor="#2b2b2b"
         translucent={true}
         style="light"
       />
+
       <Stack.Navigator initialRouteName="OnBoarding">
+        <Stack.Screen
+          name="Home"
+          options={{
+            // Hide the header for all other routes.
+            headerShown: false,
+          }}
+          component={Home}
+        />
         <Stack.Screen
           name="OnBoarding"
           options={{
@@ -32,17 +44,10 @@ export default function App() {
           name="Register"
           component={Register}
         />
+
         <Stack.Screen
           name="Login"
           component={Login}
-        />
-        <Stack.Screen
-          name="Home"
-          options={{
-            // Hide the header for all other routes.
-            headerShown: false,
-          }}
-          component={Home}
         />
         <Stack.Screen
           name="ProfileSetup"
