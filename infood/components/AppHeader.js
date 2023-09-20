@@ -13,13 +13,14 @@ const AppHeader = ({ children }) => {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
-    height: "25%",
+    height: "30%",
   },
   content: {
     flexDirection: "row",
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
+    padding: 10,
   },
 });
 export default AppHeader;
