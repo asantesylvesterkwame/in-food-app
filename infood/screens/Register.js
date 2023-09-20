@@ -18,6 +18,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Link } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Provider, Auth } from "../firebase.config";
+import { Icon } from "react-native-elements";
+import * as Google from "expo-google-app-auth";
 
 const Stack = createStackNavigator();
 export default function Register({ navigation }) {
@@ -71,6 +73,34 @@ export default function Register({ navigation }) {
         console.log(errorMessage);
       });
   };
+  const signInWithGoogle = async () => {
+    try {
+      const { type, accessToken, user } = await Google.logInAsync({
+        androidClientId:
+          "236660884581-7o03u29m7p9cmf6k3l1po36ni5khe75o.apps.googleusercontent.com",
+        iosClientId:
+          "236660884581-09q5uf96mk9no497occggbbt0ciat4tr.apps.googleusercontent.com",
+        scopes: ["profile", "email"],
+      });
+
+      if (type === "success") {
+        // Build Firebase credential with the Google access token.
+        const credential = firebase.auth.GoogleAuthProvider.credential(
+          null,
+          accessToken
+        );
+
+        // Sign in with Firebase using the Google credential.
+        await firebase.auth().signInWithCredential(credential);
+
+        // Access the signed-in user's information.
+        console.log("Logged in as:", user.displayName);
+        navigation.navigate("Home");
+      }
+    } catch (error) {
+      console.log("Error signing in with Google:", error);
+    }
+  };
   return (
     <SafeAreaProvider style={styles.viewArea}>
       <SafeAreaView>
@@ -118,19 +148,40 @@ export default function Register({ navigation }) {
           >
             Register
           </Button>
-          <Button
-            textColor={colors.primary}
+          <View
             style={{
-              width: "80%",
-              textAlign: "center",
-              backgroundColor: colors.tertiary,
-              borderWidth: 1,
-              borderRadius: 5,
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "row",
+              gap: 20,
             }}
           >
-            {/* <FontAwesome
+            <Icon
+              name="google"
+              type="material-community"
+              color={colors.secondary}
+              containerStyle={styles.authIcons}
+              onPress={signInWithGoogle}
+            />
+            <Icon
+              name="apple"
+              type="material-community"
+              color={colors.secondary}
+              containerStyle={styles.authIcons}
+            />
+            <Icon
+              name="facebook"
+              type="material-community"
+              color={colors.secondary}
+              containerStyle={styles.authIcons}
+            />
+            <Icon
+              name="phone"
+              type="material-community"
+              color={colors.secondary}
+              containerStyle={styles.authIcons}
+            />
+          </View>
+
+          {/* <FontAwesome
               name="google"
               size={20}
               color={colors.primary}
@@ -140,8 +191,6 @@ export default function Register({ navigation }) {
                 marginRight: 10,
               }}
             /> */}
-            <Text>Sign Up with Google</Text>
-          </Button>
 
           <Text>
             Already Have An Account?{" "}
@@ -181,5 +230,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     width: "80%",
     borderBottom: "transparent",
+  },
+  authIcons: {
+    backgroundColor: colors.tertiary,
+    borderRadius: 100,
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
