@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import InFood from "../assets/InFood.png";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
 import { TextInput } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +12,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Link } from "expo-router";
 import { Provider, Auth } from "../firebase.config";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createStackNavigator();
 export default function Login({ navigation }) {
@@ -25,7 +26,9 @@ export default function Login({ navigation }) {
         console.log(user);
         if (user) {
           navigation.navigate("Home");
+          AsyncStorage.setItem("currentUser", JSON.stringify(user));
         }
+
         // ...
       })
       .catch((error) => {
@@ -38,7 +41,6 @@ export default function Login({ navigation }) {
       });
     // console.log(formData);
     console.log(formData);
-    
   }, []);
 
   useEffect(() => {
@@ -119,20 +121,21 @@ export default function Login({ navigation }) {
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
-          <Button
-            textColor={colors.primary}
-            style={{
-              width: "80%",
-              textAlign: "center",
-              backgroundColor: colors.tertiary,
-              borderWidth: 1,
-              borderRadius: 5,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onPress={signInWithGoogle}
-          >
-            {/* <FontAwesome
+          <TouchableOpacity>
+            <Button
+              textColor={colors.primary}
+              style={{
+                width: "80%",
+                textAlign: "center",
+                backgroundColor: colors.tertiary,
+                borderWidth: 1,
+                borderRadius: 5,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={signInWithGoogle}
+            >
+              {/* <FontAwesome
               name="google"
               size={20}
               color={colors.primary}
@@ -142,8 +145,9 @@ export default function Login({ navigation }) {
                 marginRight: 10,
               }}
             /> */}
-            <Text>Sign in with Google</Text>
-          </Button>
+              <Text>Sign in with Google</Text>
+            </Button>
+          </TouchableOpacity>
 
           <Text>
             Already Have An Account?{" "}
