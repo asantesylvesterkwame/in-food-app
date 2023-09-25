@@ -6,15 +6,12 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
-  Image,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import Resturant from "./NavigationDrawerScreens/Resturant";
 import { SimpleLineIcons } from "@expo/vector-icons";
-import Courier from "./NavigationDrawerScreens/Courier";
-import Client from "./NavigationDrawerScreens/Client";
 import { colors } from "../globals/styles";
 import AppHeader from "../components/AppHeader";
 import {
@@ -24,12 +21,15 @@ import {
   Icon,
   withBadge,
   Overlay,
+  Image,
 } from "react-native-elements";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import foodone from "../assets/foodone.jpg";
 import foodImage from "../assets/foodtwo.jpg";
 import noAvatar from "../assets/no-avatar.png";
-import { getAuth } from "firebase/auth";
+import { Auth } from "../firebase.config";
+import { onAuthStateChanged } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const Drawer = createDrawerNavigator();
 
@@ -38,9 +38,19 @@ const Stack = createStackNavigator();
 export default function Home({ navigation }) {
   const [activeTab, setActiveTab] = useState(true);
   const BadgeIcon = withBadge(3)(Icon);
-  const auth = getAuth();
+  const [refreshing, setRefreshing] = useState(false);
 
   const { width } = Dimensions.get("window");
+
+  // const [user, setUser] = useState({});
+  const [user] = useAuthState(Auth);
+
+  useEffect(() => {
+    // onAuthStateChanged(Auth, (user) => {
+    //   setUser(user);
+    //   console.log("current user", user);
+    // });
+  }, []);
 
   const data = [
     {
@@ -125,14 +135,20 @@ export default function Home({ navigation }) {
                 <Text>Old Town Park Ashaley Botwe</Text>
               </View>
               <View>
-                <Image
-                  source={
-                    // auth.currentUser.photoURL === null
-                    noAvatar
-                    // : auth.currentUser.photoURL
-                  }
-                  style={styles.profileImage}
-                />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("ProfilePage")}
+                >
+                  <Image
+                    source={
+                      user.photoURL
+                        ? { uri: user.photoURL }
+                        : require("../assets/no-avatar.png")
+                      // noAvatar
+                      // : auth.currentUser.photoURL
+                    }
+                    style={styles.profileImage}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -175,11 +191,12 @@ export default function Home({ navigation }) {
                       containerStyle={{
                         borderRadius: 25,
                         justifyContent: "flex-start",
-                        
                       }}
-                      
                     >
                       <Card.Image
+                        onPress={() => {
+                          navigation.navigate("ResturantDetails");
+                        }}
                         style={{
                           borderRadius: 25,
                           borderWidth: 1,
@@ -236,7 +253,9 @@ export default function Home({ navigation }) {
             </View>
             <View style={styles.CatTitleView}>
               <View>
-                <Text style={styles.rightCatText}>Discounts On Entire Menu</Text>
+                <Text style={styles.rightCatText}>
+                  Discounts On Entire Menu
+                </Text>
               </View>
               <View>
                 <Text style={styles.CatText}>All</Text>
@@ -595,6 +614,5 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 50,
     height: 50,
-    fill: colors.tertiary,
   },
 });
