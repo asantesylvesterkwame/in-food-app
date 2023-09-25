@@ -16,10 +16,12 @@ import { useForm } from "react-hook-form";
 import { FontAwesome } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Link } from "expo-router";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { SignInMethod, createUserWithEmailAndPassword } from "firebase/auth";
 import { Provider, Auth } from "../firebase.config";
 import { Icon } from "react-native-elements";
 import * as Google from "expo-google-app-auth";
+import { TouchableOpacity } from "react-native-gesture-handler";
+
 
 const Stack = createStackNavigator();
 export default function Register({ navigation }) {
@@ -31,7 +33,7 @@ export default function Register({ navigation }) {
         const user = userCredential.user;
         console.log(user);
         if (user) {
-          navigation.navigate("ProfileSetup");
+          navigation.navigate("Home");
         }
         // ...
       })
@@ -74,32 +76,40 @@ export default function Register({ navigation }) {
       });
   };
   const signInWithGoogle = async () => {
-    try {
-      const { type, accessToken, user } = await Google.logInAsync({
-        androidClientId:
-          "236660884581-7o03u29m7p9cmf6k3l1po36ni5khe75o.apps.googleusercontent.com",
-        iosClientId:
-          "236660884581-09q5uf96mk9no497occggbbt0ciat4tr.apps.googleusercontent.com",
-        scopes: ["profile", "email"],
-      });
+    // try {
+    //   const { type, accessToken, user } = await Google.logInAsync({
+    //     androidClientId:
+    //       "236660884581-7o03u29m7p9cmf6k3l1po36ni5khe75o.apps.googleusercontent.com",
+    //     iosClientId:
+    //       "236660884581-09q5uf96mk9no497occggbbt0ciat4tr.apps.googleusercontent.com",
+    //     scopes: ["profile", "email"],
+    //   });
 
-      if (type === "success") {
-        // Build Firebase credential with the Google access token.
-        const credential = firebase.auth.GoogleAuthProvider.credential(
-          null,
-          accessToken
-        );
+    //   if (type === "success") {
+    //     // Build Firebase credential with the Google access token.
+    //     const credential = firebase.auth.GoogleAuthProvider.credential(
+    //       null,
+    //       accessToken
+    //     );
 
-        // Sign in with Firebase using the Google credential.
-        await firebase.auth().signInWithCredential(credential);
+    //     // Sign in with Firebase using the Google credential.
+    //     await firebase.auth().signInWithCredential(credential);
 
-        // Access the signed-in user's information.
-        console.log("Logged in as:", user.displayName);
+    //     // Access the signed-in user's information.
+    //     console.log("Logged in as:", user.displayName);
+    //     navigation.navigate("Home");
+    //   }
+    // } catch (error) {
+    //   console.log("Error signing in with Google:", error);
+    // }
+    await signInWithPopup(Auth, Provider)
+      .then((res) => {
+        console.log(res);
         navigation.navigate("Home");
-      }
-    } catch (error) {
-      console.log("Error signing in with Google:", error);
-    }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   };
   return (
     <SafeAreaProvider style={styles.viewArea}>
@@ -148,37 +158,44 @@ export default function Register({ navigation }) {
           >
             Register
           </Button>
+
           <View
             style={{
               flexDirection: "row",
               gap: 20,
             }}
           >
-            <Icon
-              name="google"
-              type="material-community"
-              color={colors.secondary}
-              containerStyle={styles.authIcons}
-              onPress={signInWithGoogle}
-            />
-            <Icon
-              name="apple"
-              type="material-community"
-              color={colors.secondary}
-              containerStyle={styles.authIcons}
-            />
+            <TouchableOpacity>
+              <Icon
+                name="google"
+                type="material-community"
+                color={colors.secondary}
+                containerStyle={styles.authIcons}
+                onPress={signInWithGoogle}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Icon
+                name="apple"
+                type="material-community"
+                color={colors.secondary}
+                containerStyle={styles.authIcons}
+              />
+            </TouchableOpacity>
             <Icon
               name="facebook"
               type="material-community"
               color={colors.secondary}
               containerStyle={styles.authIcons}
             />
-            <Icon
-              name="phone"
-              type="material-community"
-              color={colors.secondary}
-              containerStyle={styles.authIcons}
-            />
+            <TouchableOpacity>
+              <Icon
+                name="phone"
+                type="material-community"
+                color={colors.secondary}
+                containerStyle={styles.authIcons}
+              />
+            </TouchableOpacity>
           </View>
 
           {/* <FontAwesome
