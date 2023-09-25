@@ -92,27 +92,29 @@ export default function Login({ navigation }) {
             style={styles.textInput}
             underlineColor="transparent"
           />
-          <Button
-            title="Submit"
-            onPress={handleSubmit(onSubmit)}
-            mode="contained"
-            style={{
-              width: "80%",
-              textAlign: "center",
-              backgroundColor: colors.secondary,
-              borderWidth: 1,
-              borderColor: colors.primary,
-              borderRadius: 5,
-            }}
-            textColor={colors.primary}
-            theme={{
-              colors: {
-                text: colors.primary,
-              },
-            }}
-          >
-            Log in
-          </Button>
+          <TouchableOpacity>
+            <Button
+              title="Submit"
+              onPress={handleSubmit(onSubmit)}
+              mode="contained"
+              style={{
+                width: "80%",
+                textAlign: "center",
+                backgroundColor: colors.secondary,
+                borderWidth: 1,
+                borderColor: colors.primary,
+                borderRadius: 5,
+              }}
+              textColor={colors.primary}
+              theme={{
+                colors: {
+                  text: colors.primary,
+                },
+              }}
+            >
+              Log in
+            </Button>
+          </TouchableOpacity>
           {error && (
             <View
               style={styles.errorCont}
